@@ -9,6 +9,7 @@ import mate.academy.service.car.CarService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CarController {
     private final CarService carService;
 
+    @PreAuthorize("hasRole('MANAGER')")
     @Operation(summary = "Create a new car", description = "Create a new car")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
@@ -39,6 +41,7 @@ public class CarController {
         return carService.findAll(pageable);
     }
 
+    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
             summary = "Get car by id",
             description = "Find a car with a passed id"
@@ -48,6 +51,7 @@ public class CarController {
         return carService.getById(id);
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     @Operation(
             summary = "Update a car",
             description = "Replace the existing car with a new one"
@@ -57,13 +61,14 @@ public class CarController {
         return carService.update(carDto, id);
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     @Operation(
             summary = "Delete category",
             description = "Delete a category with a passed id"
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void deleteCar(Long id) {
+    public void deleteCar(@PathVariable Long id) {
         carService.deleteById(id);
     }
 }
