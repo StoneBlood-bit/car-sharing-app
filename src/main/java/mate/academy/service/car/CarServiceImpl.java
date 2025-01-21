@@ -30,6 +30,7 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarDto getById(Long id) {
+        
         Car car = carRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't get car by id: " + id)
         );

@@ -1,6 +1,7 @@
 package mate.academy.mapper;
 
 import mate.academy.config.MapperConfig;
+import mate.academy.dto.user.UpdateUserProfileDto;
 import mate.academy.dto.user.UserRegistrationRequestDto;
 import mate.academy.dto.user.UserResponseDto;
 import mate.academy.model.User;
@@ -14,4 +15,6 @@ public interface UserMapper {
     User toEntity(UserRegistrationRequestDto requestDto);
 
     void updateUser(UserRegistrationRequestDto requestDto, @MappingTarget User user);
+
+    void updateUserProfile(UpdateUserProfileDto userProfileDto, @MappingTarget User user);
 }

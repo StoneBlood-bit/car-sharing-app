@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-rentals
+      author: developer
+      changes:
+        - insert:
+            tableName: rentals
+            columns:
+              - column:
+                  name: rental_date
+                  valueDate: 2025-01-20T10:00:00
+              - column:
+                  name: return_date
+                  valueDate: 2025-01-24T10:00:00
+              - column:
+                  name: actual_return_date
+                  valueDate: 2025-01-24T09:00:00
+              - column:
+                  name: car_id
+                  value: 1
+              - column:
+                  name: user_id
+                  value: 2
+        - insert:
+            tableName: rentals
+            columns:
+              - column:
+                  name: rental_date
+                  valueDate: 2025-01-20T10:00:00
+              - column:
+                  name: return_date
+                  valueDate: 2025-01-30T10:00:00
+              - column:
+                  name: car_id
+                  value: 2
+              - column:
+                  name: user_id
+                  value: 2
+        - insert:
+            tableName: rentals
+            columns:
+              - column:
+                  name: rental_date
+                  valueDate: 2025-01-20T10:00:00
+              - column:
+                  name: return_date
+                  valueDate: 2025-01-24T10:00:00
+              - column:
+                  name: actual_return_date
+                  valueDate: 2025-01-24T09:00:00
+              - column:
+                  name: car_id
+                  value: 3
+              - column:
+                  name: user_id
+                  value: 3
+        - insert:
+            tableName: rentals
+            columns:
+              - column:
+                  name: rental_date
+                  valueDate: 2025-01-20T10:00:00
+              - column:
+                  name: return_date
+                  valueDate: 2025-01-30T10:00:00
+              - column:
+                  name: car_id
+                  value: 2
+              - column:
+                  name: user_id
+                  value: 3

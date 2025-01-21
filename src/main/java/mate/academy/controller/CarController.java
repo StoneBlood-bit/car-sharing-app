@@ -41,13 +41,13 @@ public class CarController {
         return carService.findAll(pageable);
     }
 
-    @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
             summary = "Get car by id",
             description = "Find a car with a passed id"
     )
     @GetMapping("/{id}")
     public CarDto getById(@PathVariable Long id) {
+        System.out.println("Processing GET request for /cars/" + id);
         return carService.getById(id);
     }
 
