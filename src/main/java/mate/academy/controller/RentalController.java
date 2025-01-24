@@ -78,4 +78,14 @@ public class RentalController {
         rentalService.completeRental(id);
         return ResponseEntity.ok("Rental completed successfully.");
     }
+
+    @PreAuthorize("hasRole('CUSTOMER')")
+    @Operation(
+            summary = "Get rental by id",
+            description = "Get rental with a passed id"
+    )
+    @GetMapping("/{id}")
+    public RentalDetailDto getById(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        return rentalService.getRentalById(id, user.getId());
+    }
 }

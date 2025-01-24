@@ -12,4 +12,6 @@ public interface RentalService {
     List<RentalDetailDto> getRentals(RentalFilterRequestDto filter, User currentUser);
 
     void completeRental(Long rentalId);
+
+    RentalDetailDto getRentalById(Long rentalId, Long userId);
 }

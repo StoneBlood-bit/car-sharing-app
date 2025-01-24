@@ -124,4 +124,13 @@ public class RentalServiceImpl implements RentalService {
 
         carRepository.save(car);
     }
+
+    @Override
+    public RentalDetailDto getRentalById(Long rentalId, Long userId) {
+        Rental rental = rentalRepository.findByIdAndUserId(rentalId, userId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find rental with id: " + rentalId)
+        );
+
+        return rentalMapper.toDto(rental);
+    }
 }
