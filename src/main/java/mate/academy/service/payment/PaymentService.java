@@ -17,5 +17,5 @@ public interface PaymentService {
 
     void successfulPayment(String sessionId);
 
-    String cancelPayment();
+    String cancelPayment(String sessionId);
 }

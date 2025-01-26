@@ -11,6 +11,7 @@ import mate.academy.mapper.RentalMapper;
 import mate.academy.model.Car;
 import mate.academy.model.Rental;
 import mate.academy.model.User;
+import mate.academy.notification.NotificationService;
 import mate.academy.repository.CarRepository;
 import mate.academy.repository.RentalRepository;
 import mate.academy.repository.UserRepository;
@@ -25,6 +26,7 @@ public class RentalServiceImpl implements RentalService {
     private final RentalMapper rentalMapper;
     private final UserRepository userRepository;
     private final CarRepository carRepository;
+    private final NotificationService notificationService;
 
     private Logger logger = LoggerFactory.getLogger(RentalServiceImpl.class);
 
@@ -53,7 +55,11 @@ public class RentalServiceImpl implements RentalService {
         rental.setCar(car);
         rental.setUser(user);
 
-        return rentalMapper.toDto(rentalRepository.save(rental));
+        Rental saved = rentalRepository.save(rental);
+
+        notificationService.sendNewRentalNotification(saved);
+
+        return rentalMapper.toDto(saved);
     }
 
     @Override
@@ -115,6 +121,8 @@ public class RentalServiceImpl implements RentalService {
         if (rental.getActualReturnDate() != null) {
             throw new RuntimeException("Rental has already been completed.");
         }
+
+        notificationService.sendReturnRentalNotification(rental);
 
         rental.setActualReturnDate(LocalDateTime.now());
         rentalRepository.save(rental);

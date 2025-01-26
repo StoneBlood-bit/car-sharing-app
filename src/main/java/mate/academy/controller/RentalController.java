@@ -26,7 +26,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Rental manager", description = "Endpoint of maneging rentals")
+@Tag(
+        name = "Rental Management",
+        description = "Endpoints for managing car rentals, including creation,"
+                + " retrieval, and completion of rentals."
+)
 @RestController
 @RequestMapping("/rentals")
 @RequiredArgsConstructor
@@ -35,7 +39,11 @@ public class RentalController {
     private final RentalService rentalService;
 
     @PreAuthorize("hasRole('CUSTOMER')")
-    @Operation(summary = "Create a new rental", description = "Create a new rental")
+    @Operation(
+            summary = "Create a new rental",
+            description = "Allows a customer to initiate a new rental by providing rental details."
+                    + " Requires CUSTOMER role."
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public RentalDetailDto createRental(
@@ -46,7 +54,15 @@ public class RentalController {
     }
 
     @PreAuthorize("hasRole('MANAGER') or (#userId == null && principal.id == #currentUser.id)")
-    @Operation(summary = "Get all rentals", description = "Get list of all rentals")
+    @Operation(
+            summary = "Retrieve all rentals",
+            description = """
+            Fetches a list of rentals with optional filters for user-specific rentals 
+            and active status.
+            Requires MANAGER role or retrieves rentals for the currently 
+            authenticated user if no user ID is specified.
+            """
+    )
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<RentalDetailDto> getRentals(
@@ -71,7 +87,8 @@ public class RentalController {
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
             summary = "Complete a rental",
-            description = "Mark a rental as completed and increase car inventory."
+            description = "Marks a rental as completed by the customer,"
+                    + " updating the car inventory. Requires CUSTOMER role."
     )
     @PatchMapping("/{id}/complete")
     public ResponseEntity<String> completeRental(@PathVariable Long id) {
@@ -81,8 +98,9 @@ public class RentalController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
-            summary = "Get rental by id",
-            description = "Get rental with a passed id"
+            summary = "Retrieve rental by ID",
+            description = "Fetches detailed information about a specific rental "
+                    + "by its unique identifier. Requires CUSTOMER role."
     )
     @GetMapping("/{id}")
     public RentalDetailDto getById(@PathVariable Long id, @AuthenticationPrincipal User user) {

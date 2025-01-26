@@ -12,6 +12,7 @@ import mate.academy.exception.EntityNotFoundException;
 import mate.academy.mapper.PaymentMapper;
 import mate.academy.model.Payment;
 import mate.academy.model.Rental;
+import mate.academy.notification.NotificationService;
 import mate.academy.repository.PaymentRepository;
 import mate.academy.repository.RentalRepository;
 import mate.academy.service.stripe.StripeService;
@@ -26,6 +27,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentMapper paymentMapper;
     private final RentalRepository rentalRepository;
     private final StripeService stripeService;
+    private final NotificationService notificationService;
 
     @Override
     public List<PaymentDtoOverview> getPaymentsByUserId(Long userId) {
@@ -69,11 +71,23 @@ public class PaymentServiceImpl implements PaymentService {
         );
 
         payment.setStatus(Payment.Status.PAID);
+
+        notificationService.sendSuccessPaymentNotification(payment);
+
         paymentRepository.save(payment);
     }
 
     @Override
-    public String cancelPayment() {
+    public String cancelPayment(String sessionId) {
+        Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find payment with session id: "
+                        + sessionId)
+        );
+
+        if (payment.getStatus().equals(Payment.Status.PENDING)) {
+            notificationService.sendCancelPaymentNotification(payment);
+        }
+
         return "Payment canceled. You can try again within 24 hours.";
     }
 

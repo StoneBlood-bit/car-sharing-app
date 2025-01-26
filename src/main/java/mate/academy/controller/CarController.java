@@ -20,7 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Car manager", description = "Endpoint for maneging cars")
+@Tag(
+        name = "Car Management",
+        description = "Endpoints for managing the car catalog, "
+                + "including adding, retrieving, updating, and deleting car entries."
+)
 @RestController
 @RequestMapping("/cars")
 @RequiredArgsConstructor
@@ -28,33 +32,40 @@ public class CarController {
     private final CarService carService;
 
     @PreAuthorize("hasRole('MANAGER')")
-    @Operation(summary = "Create a new car", description = "Create a new car")
+    @Operation(
+            summary = "Create a new car",
+            description = "Allows a manager to add a new car to the catalog."
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     public CarDto createCar(@RequestBody @Valid CarDto carDto) {
         return carService.save(carDto);
     }
 
-    @Operation(summary = "Get all cars", description = "Get list of all available cars")
+    @Operation(
+            summary = "Retrieve all cars",
+            description = "Returns a paginated list of all cars available in the catalog."
+    )
     @GetMapping
     public Page<CarDto> getAll(Pageable pageable) {
         return carService.findAll(pageable);
     }
 
     @Operation(
-            summary = "Get car by id",
-            description = "Find a car with a passed id"
+            summary = "Retrieve car by ID",
+            description = "Fetches detailed information about"
+                    + " a specific car using its unique identifier."
     )
     @GetMapping("/{id}")
     public CarDto getById(@PathVariable Long id) {
-        System.out.println("Processing GET request for /cars/" + id);
         return carService.getById(id);
     }
 
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
-            summary = "Update a car",
-            description = "Replace the existing car with a new one"
+            summary = "Update car details",
+            description = "Allows a manager to replace the details of an existing car"
+                    + " with new data. Requires MANAGER role."
     )
     @PutMapping("/{id}")
     public CarDto updateCar(@PathVariable Long id, @RequestBody @Valid CarDto carDto) {
@@ -63,8 +74,9 @@ public class CarController {
 
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
-            summary = "Delete category",
-            description = "Delete a category with a passed id"
+            summary = "Delete a car",
+            description = "Allows a manager to remove a car from the catalog"
+                    + " using its unique identifier. Requires MANAGER role."
     )
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")

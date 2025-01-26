@@ -19,7 +19,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "Users manager", description = "Endpoint for maneging users")
+@Tag(
+        name = "User Management",
+        description = "Endpoints for managing user accounts, including profile retrieval,"
+                + " role updates, and profile modifications."
+)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -28,8 +32,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
-            summary = "Get user's profile",
-            description = "Find a user with a passed id and show your profile"
+            summary = "Retrieve user's profile",
+            description = "Allows a customer to view their own profile information."
+                    + " Requires CUSTOMER role."
     )
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> getMyProfile(@AuthenticationPrincipal User user) {
@@ -39,8 +44,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('MANAGER')")
     @Operation(
-            summary = "Update a user's role",
-            description = "Replace the existing user's role with a new one"
+            summary = "Update user's role",
+            description = "Allows a manager to change the role of "
+                    + "a specific user by their unique identifier. Requires MANAGER role."
     )
     @PutMapping("/{id}/role")
     public UserResponseDto updateUserRole(
@@ -52,8 +58,9 @@ public class UserController {
 
     @PreAuthorize("hasRole('CUSTOMER')")
     @Operation(
-            summary = "Update a user",
-            description = "Replace the existing user with a new one"
+            summary = "Update user's profile",
+            description = "Allows a customer to update their profile details. "
+                    + "Requires CUSTOMER role."
     )
     @PutMapping("/me")
     public ResponseEntity<Void> updateMyProfile(

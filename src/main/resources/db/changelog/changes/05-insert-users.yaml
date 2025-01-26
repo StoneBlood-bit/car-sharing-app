@@ -21,6 +21,9 @@ databaseChangeLog:
               - column:
                   name: role
                   value: MANAGER
+              - column:
+                  name: chat_id
+                  value: null
         - insert:
             tableName: users
             columns:
@@ -39,6 +42,9 @@ databaseChangeLog:
               - column:
                   name: role
                   value: CUSTOMER
+              - column:
+                  name: chat_id
+                  value: null
         - insert:
             tableName: users
             columns:
@@ -57,3 +63,6 @@ databaseChangeLog:
               - column:
                   name: role
                   value: CUSTOMER
+              - column:
+                  name: chat_id
+                  value: null

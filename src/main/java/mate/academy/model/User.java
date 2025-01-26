@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "chat_id", unique = true, nullable = true)
+    private String chatId;
+
     @Column(nullable = false, name = "is_deleted")
     private boolean isDeleted = false;
 
