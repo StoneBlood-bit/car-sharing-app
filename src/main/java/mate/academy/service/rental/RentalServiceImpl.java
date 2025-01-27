@@ -67,49 +67,14 @@ public class RentalServiceImpl implements RentalService {
     @Override
     @Transactional
     public List<RentalDetailDto> getRentals(RentalFilterRequestDto filter, User currentUser) {
-        logger.info("Fetching rentals for user: {}, role: {}, filter: userId={}, isActive={}",
-                currentUser.getEmail(), currentUser.getRole(), filter.getUserId(),
-                filter.getIsActive());
-
         List<Rental> rentals;
 
         if (currentUser.isAdmin()) {
-            logger.info("User is admin, "
-                    + "fetching all rentals or filtering based on userId and isActive");
-            if (filter.getUserId() != null && filter.getIsActive() != null) {
-                logger.info("Filter by userId={} and isActive={}",
-                        filter.getUserId(), filter.getIsActive());
-                if (filter.getIsActive()) {
-                    rentals = rentalRepository.findActiveRentalsByUserId(filter.getUserId());
-                } else {
-                    rentals = rentalRepository.findCompletedRentalsByUserId(filter.getUserId());
-                }
-            } else if (filter.getUserId() != null) {
-                logger.info("Filter by userId={}", filter.getUserId());
-                rentals = rentalRepository.findByUserId(filter.getUserId());
-            } else if (filter.getIsActive() != null) {
-                logger.info("Filter by isActive={}", filter.getIsActive());
-                rentals = filter.getIsActive()
-                        ? rentalRepository.findActiveRentals()
-                        : rentalRepository.findCompletedRentals();
-            } else {
-                logger.info("No filters applied, fetching all rentals");
-                rentals = rentalRepository.findAll();
-            }
+            rentals = getRentalsForManager(filter);
         } else {
-            logger.info("User is not admin, fetching rentals for userId={}", currentUser.getId());
-            if (filter.getIsActive() != null) {
-                logger.info("Filter by isActive={}", filter.getIsActive());
-                rentals = filter.getIsActive()
-                        ? rentalRepository.findActiveRentalsByUserId(currentUser.getId())
-                        : rentalRepository.findCompletedRentalsByUserId(currentUser.getId());
-            } else {
-                logger.info("Fetching rentals for current user only");
-                rentals = rentalRepository.findByUserId(currentUser.getId());
-            }
+            rentals = getRentalsForCustomer(filter, currentUser);
         }
 
-        logger.info("Fetched {} rentals from repository", rentals.size());
         return rentals.stream()
                 .map(rentalMapper::toDto)
                 .toList();
@@ -145,5 +110,33 @@ public class RentalServiceImpl implements RentalService {
         );
 
         return rentalMapper.toDto(rental);
+    }
+
+    private List<Rental> getRentalsForManager(RentalFilterRequestDto filter) {
+        if (filter.getUserId() != null && filter.getIsActive() != null) {
+            if (filter.getIsActive()) {
+                return rentalRepository.findActiveRentalsByUserId(filter.getUserId());
+            } else {
+                return rentalRepository.findCompletedRentalsByUserId(filter.getUserId());
+            }
+        } else if (filter.getUserId() != null) {
+            return rentalRepository.findByUserId(filter.getUserId());
+        } else if (filter.getIsActive() != null) {
+            return filter.getIsActive()
+                    ? rentalRepository.findActiveRentals()
+                    : rentalRepository.findCompletedRentals();
+        } else {
+            return rentalRepository.findAll();
+        }
+    }
+
+    private List<Rental> getRentalsForCustomer(RentalFilterRequestDto filter, User currentUser) {
+        if (filter.getIsActive() != null) {
+            return filter.getIsActive()
+                    ? rentalRepository.findActiveRentalsByUserId(currentUser.getId())
+                    : rentalRepository.findCompletedRentalsByUserId(currentUser.getId());
+        } else {
+            return rentalRepository.findByUserId(currentUser.getId());
+        }
     }
 }
