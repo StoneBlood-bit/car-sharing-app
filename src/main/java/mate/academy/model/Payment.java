@@ -40,7 +40,7 @@ public class Payment {
     @URL
     private String sessionUrl;
 
-    @Column(name = "session_id", nullable = false)
+    @Column(name = "session_id", nullable = false, unique = true)
     private String sessionId;
 
     @Column(nullable = false)
