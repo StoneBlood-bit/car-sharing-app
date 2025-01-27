@@ -9,7 +9,6 @@ databaseChangeLog:
               - column:
                   name: id
                   type: bigint
-                  autoIncrement: true
                   constraints:
                     nullable: false
                     primaryKey: true
@@ -49,3 +48,5 @@ databaseChangeLog:
             referencedTableName: rentals
             referencedColumnNames: id
             constraintName: fk_rental
+        - sql:
+            sql: "ALTER TABLE payments ADD CONSTRAINT fk_payments_rental_id FOREIGN KEY (id) REFERENCES rentals (id) ON DELETE CASCADE"
