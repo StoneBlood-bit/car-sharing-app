@@ -17,6 +17,7 @@ import mate.academy.repository.PaymentRepository;
 import mate.academy.repository.RentalRepository;
 import mate.academy.service.stripe.StripeService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final NotificationService notificationService;
 
     @Override
+    @Transactional
     public List<PaymentDtoOverview> getPaymentsByUserId(Long userId) {
         return paymentRepository.findByRentalUserId(userId).stream()
                 .map(paymentMapper::toDtoOverview)
@@ -37,6 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public PaymentResponseDto createPaymentSession(
             PaymentRequestDto requestDto,
             UriComponentsBuilder uriComponentsBuilder
@@ -64,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public void successfulPayment(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find payment with session id: "
@@ -78,6 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public String cancelPayment(String sessionId) {
         Payment payment = paymentRepository.findBySessionId(sessionId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find payment with session id: "

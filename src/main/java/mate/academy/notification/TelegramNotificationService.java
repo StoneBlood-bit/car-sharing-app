@@ -8,6 +8,7 @@ import mate.academy.model.Rental;
 import mate.academy.model.User;
 import mate.academy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -43,6 +44,7 @@ public class TelegramNotificationService implements NotificationService {
         }
     }
 
+    @Async
     @Override
     public void sendNewRentalNotification(Rental rental) {
         String message = String.format(
@@ -80,6 +82,7 @@ public class TelegramNotificationService implements NotificationService {
         sendNotification(rental.getUser().getId(), message);
     }
 
+    @Async
     @Override
     public void sendReturnRentalNotification(Rental rental) {
         String message = String.format(
@@ -95,6 +98,7 @@ public class TelegramNotificationService implements NotificationService {
         sendNotification(rental.getUser().getId(), message);
     }
 
+    @Async
     @Override
     public void sendSuccessPaymentNotification(Payment payment) {
         String message = "Payment was successful!";
@@ -102,6 +106,7 @@ public class TelegramNotificationService implements NotificationService {
         sendNotification(payment.getRental().getUser().getId(), message);
     }
 
+    @Async
     @Override
     public void sendCancelPaymentNotification(Payment payment) {
         String message = "Payment has been cancelled!";

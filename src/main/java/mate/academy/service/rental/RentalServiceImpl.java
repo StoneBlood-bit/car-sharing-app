@@ -18,6 +18,7 @@ import mate.academy.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +32,7 @@ public class RentalServiceImpl implements RentalService {
     private Logger logger = LoggerFactory.getLogger(RentalServiceImpl.class);
 
     @Override
+    @Transactional
     public RentalDetailDto createRental(RentalRequestDto requestDto, String email) {
         Car car = carRepository.findById(requestDto.getCarId()).orElseThrow(
                 () -> new EntityNotFoundException(
@@ -63,6 +65,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
     public List<RentalDetailDto> getRentals(RentalFilterRequestDto filter, User currentUser) {
         logger.info("Fetching rentals for user: {}, role: {}, filter: userId={}, isActive={}",
                 currentUser.getEmail(), currentUser.getRole(), filter.getUserId(),
@@ -113,6 +116,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
     public void completeRental(Long rentalId) {
         Rental rental = rentalRepository.findById(rentalId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find rental with id: " + rentalId)
@@ -134,6 +138,7 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
+    @Transactional
     public RentalDetailDto getRentalById(Long rentalId, Long userId) {
         Rental rental = rentalRepository.findByIdAndUserId(rentalId, userId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find rental with id: " + rentalId)

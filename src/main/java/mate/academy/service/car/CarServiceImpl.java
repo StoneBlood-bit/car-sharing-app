@@ -9,6 +9,7 @@ import mate.academy.repository.CarRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -17,6 +18,7 @@ public class CarServiceImpl implements CarService {
     private final CarMapper carMapper;
 
     @Override
+    @Transactional
     public CarDto save(CarDto carDto) {
         Car car = carMapper.toModel(carDto);
         return carMapper.toDto(carRepository.save(car));
@@ -38,6 +40,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public CarDto update(CarDto carDto, Long id) {
         Car existingCar = carRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't get car by id: " + id)
@@ -47,6 +50,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("Id must not be null!");
