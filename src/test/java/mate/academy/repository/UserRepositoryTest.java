@@ -17,11 +17,11 @@ import org.springframework.test.context.jdbc.Sql;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(
-        scripts = "classpath:database/create-user.sql",
+        scripts = "classpath:database/02-create-user.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS
 )
 @Sql(
-        scripts = "classpath:database/clear-users-table.sql",
+        scripts = "classpath:database/01-clear-users-table.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS
 )
 public class UserRepositoryTest {
