@@ -1,7 +1,7 @@
 package mate.academy.dto;
 
-import lombok.Data;
 import java.util.List;
+import lombok.Data;
 
 @Data
 public class PageResponse<T> {

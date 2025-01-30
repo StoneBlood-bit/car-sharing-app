@@ -59,7 +59,6 @@ public class RentalServiceTest {
     void createRental_ValidData_ShouldReturnRentalDetailDto() {
         Long carId = 1L;
         Long userId = 1L;
-        String email = "bob@gmail.com";
 
         RentalRequestDto requestDto = new RentalRequestDto();
         requestDto.setCarId(carId);
@@ -70,6 +69,8 @@ public class RentalServiceTest {
         Car car = new Car();
         car.setId(carId);
         car.setInventory(12);
+
+        String email = "bob@gmail.com";
 
         User user = new User();
         user.setEmail(email);
@@ -139,7 +140,6 @@ public class RentalServiceTest {
     @DisplayName("Create rental when user not found")
     void createRental_UserNotFound_ShouldThrowException() {
         Long carId = 1L;
-        String email = "bob@gmail.com";
 
         RentalRequestDto requestDto = new RentalRequestDto();
         requestDto.setCarId(carId);
@@ -147,6 +147,8 @@ public class RentalServiceTest {
         Car car = new Car();
         car.setId(carId);
         car.setInventory(1);
+
+        String email = "bob@gmail.com";
 
         when(carRepository.findById(carId)).thenReturn(Optional.of(car));
         when(userRepository.findByEmail(email)).thenReturn(Optional.empty());

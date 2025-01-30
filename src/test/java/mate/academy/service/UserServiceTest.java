@@ -3,21 +3,22 @@ package mate.academy.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import mate.academy.dto.user.UpdateUserProfileDto;
 import mate.academy.dto.user.UserRegistrationRequestDto;
 import mate.academy.dto.user.UserResponseDto;
 import mate.academy.dto.user.UserRoleUpdateDto;
 import mate.academy.exception.EntityNotFoundException;
 import mate.academy.exception.RegistrationException;
-import mate.academy.mapper.CarMapper;
 import mate.academy.mapper.UserMapper;
-import mate.academy.model.Car;
 import mate.academy.model.User;
-import mate.academy.repository.CarRepository;
 import mate.academy.repository.UserRepository;
-import mate.academy.service.car.CarServiceImpl;
 import mate.academy.service.user.UserServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,13 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -80,7 +75,7 @@ public class UserServiceTest {
 
         verify(userRepository, times(1)).existsByEmail(requestDto.getEmail());
         verify(userMapper, times(1)).toEntity(requestDto);
-        verify(passwordEncoder, times(1)).encode(requestDto.getPassword());  // Перевірка кодування пароля
+        verify(passwordEncoder, times(1)).encode(requestDto.getPassword());
         verify(userRepository, times(1)).save(user);
         verify(userMapper, times(1)).toUserResponse(user);
         verifyNoMoreInteractions(userRepository, userMapper, passwordEncoder);
@@ -100,7 +95,8 @@ public class UserServiceTest {
 
         assertThatThrownBy(() -> userService.register(requestDto))
                 .isInstanceOf(RegistrationException.class)
-                .hasMessageContaining("User with email " + requestDto.getEmail() + " already exists.");
+                .hasMessageContaining("User with email " + requestDto.getEmail()
+                        + " already exists.");
 
         verify(userRepository, times(1)).existsByEmail(requestDto.getEmail());
         verifyNoMoreInteractions(userRepository, userMapper, passwordEncoder);

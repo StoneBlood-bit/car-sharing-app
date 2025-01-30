@@ -33,7 +33,6 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     @Query("SELECT r FROM Rental r WHERE r.actualReturnDate IS NOT NULL")
     List<Rental> findCompletedRentals();
 
-
     List<Rental> findByReturnDateBeforeAndActualReturnDateIsNull(LocalDateTime date);
 
     List<Rental> findByReturnDateAfterOrActualReturnDateIsNotNull(LocalDateTime date);

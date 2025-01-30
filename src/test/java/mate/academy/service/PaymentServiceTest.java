@@ -15,12 +15,13 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import com.stripe.exception.StripeException;
 import mate.academy.dto.payment.PaymentDtoOverview;
 import mate.academy.dto.payment.PaymentRequestDto;
 import mate.academy.dto.payment.PaymentResponseDto;
@@ -34,7 +35,6 @@ import mate.academy.repository.PaymentRepository;
 import mate.academy.repository.RentalRepository;
 import mate.academy.service.payment.PaymentServiceImpl;
 import mate.academy.service.stripe.StripeService;
-import com.stripe.model.checkout.Session;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,11 +77,12 @@ public class PaymentServiceTest {
         PaymentDtoOverview dto2 = new PaymentDtoOverview();
 
         List<Payment> payments = List.of(payment1, payment2);
-        List<PaymentDtoOverview> expectedDtos = List.of(dto1, dto2);
 
         when(paymentRepository.findByRentalUserId(userId)).thenReturn(payments);
         when(paymentMapper.toDtoOverview(payment1)).thenReturn(dto1);
         when(paymentMapper.toDtoOverview(payment2)).thenReturn(dto2);
+
+        List<PaymentDtoOverview> expectedDtos = List.of(dto1, dto2);
 
         List<PaymentDtoOverview> actualDtos = paymentService.getPaymentsByUserId(userId);
 
@@ -113,9 +114,6 @@ public class PaymentServiceTest {
     void createPaymentSession_ValidData_ShouldReturnPaymentResponseDto() throws StripeException {
         Long rentalId = 1L;
         String paymentType = "PAYMENT";
-        BigDecimal expectedAmount = BigDecimal.valueOf(1451.88);
-        String sessionId = "sess_123";
-        String sessionUrl = "https://checkout.stripe.com/pay/sess_123";
 
         PaymentRequestDto requestDto = new PaymentRequestDto();
         requestDto.setRentalId(rentalId);
@@ -131,6 +129,9 @@ public class PaymentServiceTest {
         rental.setReturnDate(LocalDateTime.now().plusDays(12));
         rental.setActualReturnDate(LocalDateTime.now().plusDays(11));
         rental.setCar(car);
+
+        String sessionId = "sess_123";
+        String sessionUrl = "https://checkout.stripe.com/pay/sess_123";
 
         Session session = mock(Session.class);
         when(session.getId()).thenReturn(sessionId);
@@ -156,6 +157,7 @@ public class PaymentServiceTest {
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
 
+        BigDecimal expectedAmount = BigDecimal.valueOf(1451.88);
         verify(rentalRepository, times(1)).findById(rentalId);
         verify(stripeService, times(1)).createSession(rental, paymentType,
                 expectedAmount, uriBuilder);
@@ -188,7 +190,8 @@ public class PaymentServiceTest {
 
         when(paymentRepository.findBySessionId(sessionId)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> paymentService.successfulPayment(sessionId));
+        assertThrows(EntityNotFoundException.class,
+                () -> paymentService.successfulPayment(sessionId));
 
         verify(paymentRepository, times(1)).findBySessionId(sessionId);
         verifyNoMoreInteractions(paymentRepository);

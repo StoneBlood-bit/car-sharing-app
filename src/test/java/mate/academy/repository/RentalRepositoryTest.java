@@ -73,8 +73,9 @@ public class RentalRepositoryTest {
         Long validUserId = 1L;
         Long validRentalId = 1L;
 
-        Rental actualRental = rentalRepository.findByIdAndUserId(validRentalId, validUserId).orElseThrow(
-                () -> new EntityNotFoundException("Can't find user")
+        Rental actualRental = rentalRepository
+                .findByIdAndUserId(validRentalId, validUserId).orElseThrow(
+                    () -> new EntityNotFoundException("Can't find user")
         );
 
         assertEquals(
@@ -149,11 +150,13 @@ public class RentalRepositoryTest {
     @Test
     @DisplayName("Find active rentals when they are not")
     @Sql(
-            scripts = "classpath:database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
+            scripts = "classpath:"
+                    + "database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @Sql(
-            scripts = "classpath:database/03-create-cars-users-rentals-for-rental-repository-test.sql",
+            scripts = "classpath:"
+                    + "database/03-create-cars-users-rentals-for-rental-repository-test.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
     )
     void findActiveRentals_NotFoundActiveRentals_ShouldReturnEmptyList() {
@@ -251,11 +254,13 @@ public class RentalRepositoryTest {
     @Test
     @DisplayName("Find completed rentals when they are not")
     @Sql(
-            scripts = "classpath:database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
+            scripts = "classpath:"
+                    + "database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
     )
     @Sql(
-            scripts = "classpath:database/03-create-cars-users-rentals-for-rental-repository-test.sql",
+            scripts = "classpath:"
+                    + "database/03-create-cars-users-rentals-for-rental-repository-test.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
     )
     void findCompletedRentals_NotFoundCompletedRentals_ShouldReturnEmptyList() {
@@ -292,8 +297,8 @@ public class RentalRepositoryTest {
     void findByReturnDateAfterOrActualReturnDateIsNotNull_Valid_ShouldReturnListOfRentals() {
         LocalDateTime valid = LocalDateTime.parse("2025-01-25 14:30", formatter);
 
-        List<Rental> actualList = rentalRepository.
-                findByReturnDateAfterOrActualReturnDateIsNotNull(valid);
+        List<Rental> actualList = rentalRepository
+                .findByReturnDateAfterOrActualReturnDateIsNotNull(valid);
 
         assertEquals(2, actualList.size());
         assertEquals(
