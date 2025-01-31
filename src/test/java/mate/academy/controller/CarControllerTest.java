@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -177,4 +178,135 @@ public class CarControllerTest {
         assertEquals(3, actualList.size());
         assertEquals(expected, actualList);
     }
+
+    @Sql(
+            scripts = "classpath"
+                    + ":database/03-create-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
+    @Sql(
+            scripts = "classpath:"
+                    + "database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+    )
+    @Test
+    @DisplayName("Get car by valid id")
+    void getById_ValidId_ShouldReturnCarDto() throws Exception {
+        Long validId = 1L;
+
+        CarDto expected = new CarDto();
+        expected.setId(validId);
+        expected.setModel("X5");
+        expected.setBrand("BMW");
+        expected.setType("SUV");
+        expected.setInventory(13);
+        expected.setDailyFee(BigDecimal.valueOf(130.99));
+
+        MvcResult result = mockMvc.perform(get("/cars/{id}", validId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CarDto actualCar = objectMapper.readValue(jsonResponse, CarDto.class);
+
+        assertEquals(expected, actualCar);
+    }
+
+    @Sql(
+            scripts = "classpath"
+                    + ":database/03-create-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
+    @Sql(
+            scripts = "classpath:"
+                    + "database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+    )
+    @Test
+    @DisplayName("Get car by invalid id")
+    void getById_InvalidId_ShouldThrowException() throws Exception {
+        Long invalidId = 999L;
+
+        mockMvc.perform(get("/cars/{id}", invalidId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+    }
+
+    @Sql(
+            scripts = "classpath"
+                    + ":database/03-create-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
+    @Sql(
+            scripts = "classpath:"
+                    + "database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+    )
+    @WithMockUser(username = "manager", roles = {"MANAGER"})
+    @Test
+    @DisplayName("Update car with a valid data")
+    void updateCar_ValidData_ShouldReturnCarDto() throws Exception {
+        CarDto carDto = new CarDto();
+        carDto.setId(1L);
+        carDto.setModel("X5");
+        carDto.setBrand("BMW");
+        carDto.setType("SUV");
+        carDto.setInventory(13);
+        carDto.setDailyFee(BigDecimal.valueOf(130.99));
+
+        Long carId = 1L;
+        CarDto updatedCarDto = new CarDto();
+        updatedCarDto.setId(carId);
+        updatedCarDto.setModel("X5");
+        updatedCarDto.setBrand("BMW");
+        updatedCarDto.setType("SUV");
+        updatedCarDto.setInventory(13);
+        updatedCarDto.setDailyFee(BigDecimal.valueOf(130.99));
+
+        MvcResult result = mockMvc.perform(put("/cars/{id}", carId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(carDto)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = result.getResponse().getContentAsString();
+        CarDto actualUpdatedCarDto = objectMapper.readValue(jsonResponse, CarDto.class);
+
+        assertTrue(reflectionEquals(updatedCarDto, actualUpdatedCarDto));
+    }
+
+    @Sql(
+            scripts = "classpath"
+                    + ":database/03-create-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
+    @Sql(
+            scripts = "classpath:"
+                    + "database/04-delete-cars-users-rentals-for-rental-repository-test.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
+    )
+    @WithMockUser(username = "manager", roles = {"MANAGER"})
+    @Test
+    @DisplayName("Update car with a invalid data")
+    void updateCar_InvalidData_BadRequest() throws Exception {
+        CarDto carDto = new CarDto();
+        carDto.setType("WRONG");
+        carDto.setModel("");
+        carDto.setBrand("");
+        carDto.setInventory(-3);
+        carDto.setDailyFee(BigDecimal.valueOf(-50));
+
+        String jsonRequest = objectMapper.writeValueAsString(carDto);
+        Long carId = 1L;
+
+        mockMvc.perform(put("/cars/{id}", carId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").exists())
+                .andReturn();
+    }
+
 }

@@ -112,7 +112,7 @@ public class RentalServiceImpl implements RentalService {
         return rentalMapper.toDto(rental);
     }
 
-    private List<Rental> getRentalsForManager(RentalFilterRequestDto filter) {
+    public List<Rental> getRentalsForManager(RentalFilterRequestDto filter) {
         if (filter.getUserId() != null && filter.getIsActive() != null) {
             if (filter.getIsActive()) {
                 return rentalRepository.findActiveRentalsByUserId(filter.getUserId());
