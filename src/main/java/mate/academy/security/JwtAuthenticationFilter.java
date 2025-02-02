@@ -44,9 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         String token = getToken(request);
 
-        boolean isTokenValid = jwtUtil.isValidToken(token);
-        logger.info("Is token valid: " + isTokenValid);
-
         if (token != null && jwtUtil.isValidToken(token)) {
             String username = jwtUtil.getUsername(token);
             logger.info("Username from token: " + username);
