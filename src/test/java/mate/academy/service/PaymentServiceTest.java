@@ -5,8 +5,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -79,8 +79,12 @@ public class PaymentServiceTest {
         List<Payment> payments = List.of(payment1, payment2);
 
         when(paymentRepository.findByRentalUserId(userId)).thenReturn(payments);
-        when(paymentMapper.toDtoOverview(payment1)).thenReturn(dto1);
-        when(paymentMapper.toDtoOverview(payment2)).thenReturn(dto2);
+        when(paymentMapper.toDtoOverview(argThat(payment ->
+                Optional.ofNullable(payment).map(Payment::getId).orElse(-1L) == 101L
+        ))).thenReturn(dto1);
+        when(paymentMapper.toDtoOverview(argThat(payment ->
+                Optional.ofNullable(payment).map(Payment::getId).orElse(-1L) == 102L
+        ))).thenReturn(dto2);
 
         List<PaymentDtoOverview> expectedDtos = List.of(dto1, dto2);
 
@@ -91,7 +95,8 @@ public class PaymentServiceTest {
         assertEquals(expectedDtos, actualDtos);
 
         verify(paymentRepository, times(1)).findByRentalUserId(userId);
-        verify(paymentMapper, times(2)).toDtoOverview(any(Payment.class));
+        verify(paymentMapper, times(1)).toDtoOverview(payment1);
+        verify(paymentMapper, times(1)).toDtoOverview(payment2);
     }
 
     @Test
@@ -137,19 +142,27 @@ public class PaymentServiceTest {
         when(session.getId()).thenReturn(sessionId);
         when(session.getUrl()).thenReturn(sessionUrl);
 
+        BigDecimal expectedAmount = car.getDailyFee().multiply(BigDecimal.valueOf(12));
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl("http://localhost");
+
+        PaymentResponseDto expectedResponse = new PaymentResponseDto();
+
         when(rentalRepository.findById(rentalId)).thenReturn(Optional.of(rental));
-        when(stripeService.createSession(any(Rental.class), eq(paymentType),
-                any(BigDecimal.class), any(UriComponentsBuilder.class))).thenReturn(session);
-        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> {
+        when(stripeService.createSession(rental, paymentType, expectedAmount, uriBuilder))
+                .thenReturn(session);
+        when(paymentRepository.save(argThat(payment ->
+                payment.getRental().equals(rental)
+                        && payment.getAmount().compareTo(expectedAmount) == 0
+                        && payment.getSessionId().equals(sessionId)
+                        && payment.getSessionUrl().equals(sessionUrl)
+        ))).thenAnswer(invocation -> {
             Payment savedPayment = invocation.getArgument(0);
             savedPayment.setId(100L);
             return savedPayment;
         });
 
-        PaymentResponseDto expectedResponse = new PaymentResponseDto();
-        when(paymentMapper.toDto(any(Payment.class))).thenReturn(expectedResponse);
-
-        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl("http://localhost");
+        when(paymentMapper.toDto(argThat(payment -> payment.getId().equals(100L))))
+                .thenReturn(expectedResponse);
 
         PaymentResponseDto actualResponse = paymentService
                 .createPaymentSession(requestDto, uriBuilder);
@@ -157,12 +170,17 @@ public class PaymentServiceTest {
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
 
-        BigDecimal expectedAmount = BigDecimal.valueOf(1451.88);
         verify(rentalRepository, times(1)).findById(rentalId);
-        verify(stripeService, times(1)).createSession(rental, paymentType,
-                expectedAmount, uriBuilder);
-        verify(paymentRepository, times(1)).save(any(Payment.class));
-        verify(paymentMapper, times(1)).toDto(any(Payment.class));
+        verify(stripeService, times(1))
+                .createSession(rental, paymentType, expectedAmount, uriBuilder);
+        verify(paymentRepository, times(1)).save(argThat(payment ->
+                payment.getRental().equals(rental)
+                        && payment.getAmount().compareTo(expectedAmount) == 0
+                        && payment.getSessionId().equals(sessionId)
+                        && payment.getSessionUrl().equals(sessionUrl)
+        ));
+        verify(paymentMapper, times(1))
+                .toDto(argThat(payment -> payment.getId().equals(100L)));
     }
 
     @Test
