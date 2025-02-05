@@ -15,8 +15,6 @@ import mate.academy.notification.NotificationService;
 import mate.academy.repository.CarRepository;
 import mate.academy.repository.RentalRepository;
 import mate.academy.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,8 +26,6 @@ public class RentalServiceImpl implements RentalService {
     private final UserRepository userRepository;
     private final CarRepository carRepository;
     private final NotificationService notificationService;
-
-    private Logger logger = LoggerFactory.getLogger(RentalServiceImpl.class);
 
     @Override
     @Transactional

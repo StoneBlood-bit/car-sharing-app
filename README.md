@@ -56,6 +56,7 @@ Car Sharing is a car rental service that allows users to book vehicles, track re
    ```dotenv
   TELEGRAM_BOT_TOKEN=tokenOfYourBot
   TELEGRAM_BOT_USERNAME=usernameOfYourBot
+  TELEGRAM_API_URL=urlOfTelegramApi
   JWT_SECRET=yourJwtSecret
   STRIPE_SECRET_KEY=yourStripeSecret
   MYSQLDB_USER=yourname
