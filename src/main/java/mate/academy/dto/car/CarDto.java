@@ -19,7 +19,6 @@ public class CarDto {
     @NotBlank
     private String type;
 
-    @NotNull
     @Positive
     private int inventory;
 
