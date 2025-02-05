@@ -15,7 +15,8 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @RequiredArgsConstructor
 public class TelegramNotificationService implements NotificationService {
-    private static final String TELEGRAM_API_URL = "https://api.telegram.org/bot";
+    @Value("${telegram.api.url}")
+    private String telegramApiUrl;
     private final RestTemplate restTemplate;
     private final UserRepository userRepository;
     @Value("${telegram.bot.token}")
@@ -34,7 +35,7 @@ public class TelegramNotificationService implements NotificationService {
 
         String url = String.format(
                 "%s%s/sendMessage?chat_id=%s&text=%s",
-                TELEGRAM_API_URL, botToken, chatId, message
+                telegramApiUrl, botToken, chatId, message
         );
 
         try {

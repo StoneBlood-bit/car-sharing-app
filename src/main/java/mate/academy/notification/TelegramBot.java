@@ -10,7 +10,8 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @RequiredArgsConstructor
 public class TelegramBot {
-    private static final String TELEGRAM_API_URL = "https://api.telegram.org/bot";
+    @Value("${telegram.api.url}")
+    private String telegramApiUrl;
 
     private final RestTemplate restTemplate;
     @Value("${telegram.bot.token}")
@@ -20,7 +21,7 @@ public class TelegramBot {
     public void checkTelegramUpdates() {
         String url = String.format(
                 "%s%s/getUpdates?offset=%d",
-                TELEGRAM_API_URL, botToken, lastUpdatedId + 1
+                telegramApiUrl, botToken, lastUpdatedId + 1
         );
 
         try {
@@ -63,7 +64,7 @@ public class TelegramBot {
 
         String url = String.format(
                 "%s%s/sendMessage?chat_id=%s&text=%s",
-                TELEGRAM_API_URL, botToken, chatId, message
+                telegramApiUrl, botToken, chatId, message
         );
 
         try {
