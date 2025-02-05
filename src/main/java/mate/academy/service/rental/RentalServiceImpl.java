@@ -37,7 +37,7 @@ public class RentalServiceImpl implements RentalService {
         );
 
         if (car.getInventory() <= 0) {
-            throw new EntityNotFoundException("Car is not available for rental");
+            throw new IllegalStateException("Car is not available for rental");
         }
 
         car.setInventory(car.getInventory() - 1);

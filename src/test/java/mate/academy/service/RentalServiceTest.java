@@ -132,7 +132,7 @@ public class RentalServiceTest {
         when(carRepository.findById(carId)).thenReturn(Optional.of(car));
 
         assertThatThrownBy(() -> rentalService.createRental(requestDto, "bob@gmail.com"))
-                .isInstanceOf(EntityNotFoundException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Car is not available for rental");
     }
 
