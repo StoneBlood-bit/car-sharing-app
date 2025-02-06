@@ -225,7 +225,7 @@ public class CarControllerTest {
 
         mockMvc.perform(get("/cars/{id}", invalidId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isConflict())
+                .andExpect(status().isNotFound())
                 .andReturn();
     }
 

@@ -38,6 +38,9 @@ Car Sharing is a car rental service that allows users to book vehicles, track re
 ## Architecture
 ![Example Image](images/architecture.png)
 
+## DB Diagram
+![Example Image](images/dbdiagram.png)
+
 ## Installation and Setup
 
 ### Prerequisites
@@ -68,6 +71,9 @@ Car Sharing is a car rental service that allows users to book vehicles, track re
   SPRING_LOCAL_PORT=8080
   SPRING_DOCKER_PORT=8080
   DEBUG_PORT=5005
+- Build the JAR file: Run the following command to build the JAR file:
+  ```bash
+  mvn clean package
 - Run Docker Compose:
    ```bash
   docker-compose up --build
