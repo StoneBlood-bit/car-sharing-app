@@ -1,0 +1,53 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-payments-table
+      author: developer
+      changes:
+        - createTable:
+            tableName: payments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: status
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rental_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: session_url
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: session_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: amount
+                  type: decimal(10, 2)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: payments
+            baseColumnNames: rental_id
+            referencedTableName: rentals
+            referencedColumnNames: id
+            constraintName: fk_rental
+        - sql:
+            sql: "ALTER TABLE payments ADD CONSTRAINT fk_payments_rental_id FOREIGN KEY (id) REFERENCES rentals (id) ON DELETE CASCADE"
